@@ -15,6 +15,7 @@ import {
   Box,
 } from "@mui/material";
 import InstagramIcon from "@mui/icons-material/Instagram";
+import AddPost from "./AddPost";
 
 const InstagramLogo = styled(InstagramIcon)({
   marginRight: "8px",
@@ -233,7 +234,7 @@ const Home = () => {
       </AppBar>
       {user ? (
         <>
-        
+        <AddPost></AddPost>
         </>
       ) : (
         <>
