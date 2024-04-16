@@ -1,25 +1,3 @@
-// import { Button, TextField, Typography } from "@mui/material";
-// import React, { useState } from "react";
-
-// const AddPost = () => {
-//   const handleChange = () => {};
-
-//   return (
-//     <div className="flex flex-col items-center justify-center m-2 p-4 gap-2 border border-solid">
-//       <Typography variant="h4">Add New Post</Typography>
-//       <input
-//         type="file"
-//         onChange={() => {
-//           handleChange;
-//         }}
-//       />
-//       <TextField id="filled-basic" label="Description"></TextField>
-//       <Button variant="contained">POST</Button>
-//     </div>
-//   );
-// };
-
-// export default AddPost;
 
 import { Button, Snackbar, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
