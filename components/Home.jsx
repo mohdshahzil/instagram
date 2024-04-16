@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { styled } from "@mui/material/styles";
 import {
   AppBar,
@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import AddPost from "./AddPost";
+import Posts from "./Posts";
 
 const InstagramLogo = styled(InstagramIcon)({
   marginRight: "8px",
@@ -35,7 +36,7 @@ const Home = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [user, setuser] = useState(null);
-
+  const [posts, setposts] = useState([]);
   const signin = (e) => {
     e.preventDefault();
     auth
@@ -56,17 +57,55 @@ const Home = () => {
     setOpenSignup(false);
   };
 
+  // useEffect(() => {
+  //   const unsubscribe = auth.onAuthStateChanged((authuser) => {
+  //     if (authuser) {
+  //       setuser(authuser);
+  //     } else {
+  //       setuser(null);
+  //     }
+  //   });
+
+  //   db.collection("posts")
+  //     .orderBy("timestamp", "desc")
+  //     .onSnapshot((snapshot) => {
+  //       SettingsInputCompositeSharp(
+  //         snapshot.docs.map((doc) => ({
+  //           id: doc.id,
+  //           post: doc.data(),
+  //         }))
+  //       );
+  //     });
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, []);
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authuser) => {
-      if (authuser) {
-        setuser(authuser);
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        setuser(authUser);
       } else {
         setuser(null);
       }
     });
+
     return () => {
       unsubscribe();
     };
+  }, [user, username]);
+
+  useEffect(() => {
+    db.collection("posts")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        setposts(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            post: doc.data(),
+          }))
+        );
+      });
   }, []);
 
   return (
@@ -243,6 +282,17 @@ const Home = () => {
           </Typography>
         </>
       )}
+
+      {posts.map(({ id, post }) => (
+        <Posts
+          key={id}
+          postId={id}
+          user={user}
+          userName={post.userName}
+          caption={post.caption}
+          imageURL={post.imageURL}
+        />
+      ))}
     </>
   );
 };
