@@ -57,30 +57,6 @@ const Home = () => {
     setOpenSignup(false);
   };
 
-  // useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged((authuser) => {
-  //     if (authuser) {
-  //       setuser(authuser);
-  //     } else {
-  //       setuser(null);
-  //     }
-  //   });
-
-  //   db.collection("posts")
-  //     .orderBy("timestamp", "desc")
-  //     .onSnapshot((snapshot) => {
-  //       SettingsInputCompositeSharp(
-  //         snapshot.docs.map((doc) => ({
-  //           id: doc.id,
-  //           post: doc.data(),
-  //         }))
-  //       );
-  //     });
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, []);
-
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
