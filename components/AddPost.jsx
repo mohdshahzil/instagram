@@ -21,7 +21,7 @@
 
 // export default AddPost;
 
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, Snackbar, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
@@ -33,6 +33,7 @@ const AddPost = ({ username }) => {
   const [caption, setcaption] = useState("");
   const [progress, setprogress] = useState(0);
   const [image, setImage] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const handleChange = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
@@ -41,6 +42,10 @@ const AddPost = ({ username }) => {
   const handleUpload = () => {
     if (!image) {
       alert("No image selected");
+      return;
+    }
+    if (image.size > 5 * 1024 * 1024) {
+      alert("File size exceeds 5MB limit. Please select a smaller file.");
       return;
     }
     const uploadTask = storage.ref(`images/${image.name}`).put(image);
@@ -62,17 +67,24 @@ const AddPost = ({ username }) => {
           .child(image.name)
           .getDownloadURL()
           .then((url) => {
-            db.collection("posts").add({
-              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-              caption: caption,
-              imageURL: url,
-              userName: username,
-            });
+            db.collection("posts")
+              .add({
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                caption: caption,
+                imageURL: url,
+                userName: username,
+              })
+              .then(() => {
+                setSnackbarOpen(true);
+              });
           });
       }
     );
     setcaption(" ");
     setImage(null);
+  };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
   return (
     <div className="flex flex-col items-center justify-center m-2 p-4 gap-4 border border-solid border-gray-300 rounded-lg">
@@ -114,6 +126,17 @@ const AddPost = ({ username }) => {
       >
         Post
       </Button>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message="Post uploaded"
+        action={
+          <Button color="primary" size="small" onClick={handleSnackbarClose}>
+            Close
+          </Button>
+        }
+      />
     </div>
   );
 };
