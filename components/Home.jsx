@@ -232,9 +232,9 @@ const Home = () => {
           </RightAlignedButtons>
         </Toolbar>
       </AppBar>
-      {user ? (
+      {user && user.displayName ? (
         <>
-        <AddPost></AddPost>
+          <AddPost username={user.displayName}></AddPost>
         </>
       ) : (
         <>

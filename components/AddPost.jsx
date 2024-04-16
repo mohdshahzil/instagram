@@ -25,8 +25,11 @@ import { Button, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-
-const AddPost = () => {
+import { storage, db } from "../firebase";
+import firebase from "firebase/compat/app";
+import "firebase/compat/storage";
+import "firebase/compat/firestore";
+const AddPost = ({ username }) => {
   const [caption, setcaption] = useState("");
   const [progress, setprogress] = useState(0);
   const [image, setImage] = useState(null);
@@ -36,7 +39,40 @@ const AddPost = () => {
     }
   };
   const handleUpload = () => {
-    
+    if (!image) {
+      alert("No image selected");
+      return;
+    }
+    const uploadTask = storage.ref(`images/${image.name}`).put(image);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setprogress(progress);
+      },
+      (error) => {
+        console.log(error);
+        alert(error.message);
+      },
+      () => {
+        storage
+          .ref("images")
+          .child(image.name)
+          .getDownloadURL()
+          .then((url) => {
+            db.collection("posts").add({
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+              caption: caption,
+              imageURL: url,
+              userName: username,
+            });
+          });
+      }
+    );
+    setcaption(" ");
+    setImage(null);
   };
   return (
     <div className="flex flex-col items-center justify-center m-2 p-4 gap-4 border border-solid border-gray-300 rounded-lg">
@@ -74,6 +110,7 @@ const AddPost = () => {
         color="primary"
         startIcon={<AddIcon />}
         className="text-white"
+        onClick={handleUpload}
       >
         Post
       </Button>
